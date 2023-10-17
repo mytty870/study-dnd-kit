@@ -1,26 +1,34 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {DndContext} from '@dnd-kit/core';
+import {Draggable} from './Draggable';
+import {Droppable} from './Droppable';
+import { useState } from 'react';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+  const containers = ['A', 'B', 'C']
+  const [parent ,setParent] = useState(null)
+  // const [isDropped, setIsDropped] = useState(false);
+  const draggableMarkup = (
+    <Draggable id="draggable">Drag me</Draggable>
   );
+
+  return (
+    <DndContext onDragEnd={handleDragEnd}>
+      { parent === null ? draggableMarkup : null}
+      {containers.map((id) => (
+      <Droppable key="id" id={id}>
+        {parent===id ? draggableMarkup : 'Drop here'}
+      </Droppable>
+      ))}
+    </DndContext>
+  )
+
+  function handleDragEnd(event: any) {
+    const {over} = event
+    setParent(over ? over.id : null)
+  }
+
 }
+
+
 
 export default App;
