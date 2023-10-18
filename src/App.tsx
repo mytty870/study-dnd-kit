@@ -1,30 +1,58 @@
-import {DndContext} from '@dnd-kit/core';
-import {Draggable} from './Draggable';
-import {Droppable} from './Droppable';
+import {DndContext, KeyboardSensor, PointerSensor, closestCenter, useSensor, useSensors} from '@dnd-kit/core';
 import { useState } from 'react';
+import { SortableContext, arrayMove, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import {SortableItem} from './SortableItem'
+import { x } from '@xstyled/styled-components';
 
 function App() {
-  const containers = ['A', 'B', 'C']
-  const [parent ,setParent] = useState(null)
-  // const [isDropped, setIsDropped] = useState(false);
-  const draggableMarkup = (
-    <Draggable id="draggable">Drag me</Draggable>
+  const [items, setItems] = useState([
+    {
+      id: '1',
+      title: 'Chikamoto',
+    },
+    {
+      id: '2',
+      title: 'Nakano',
+    },
+    {
+      id: '3',
+      title: 'Morishita',
+    },
+  ])
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
   );
 
   return (
-    <DndContext onDragEnd={handleDragEnd}>
-      { parent === null ? draggableMarkup : null}
-      {containers.map((id) => (
-      <Droppable key="id" id={id}>
-        {parent===id ? draggableMarkup : 'Drop here'}
-      </Droppable>
-      ))}
+    <DndContext 
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext items={items} strategy={verticalListSortingStrategy}>
+        <x.div background="#3b3b3b" w="30%" color="#fff" fontSize="0.8rem" textAlign="center" borderRadius="6px" p="10px 0 10px 0">
+          <x.h1>打順</x.h1>
+          {items.map(item => <SortableItem key={item.id} id={item.id} title={item.title} />)}
+        </x.div>
+      </SortableContext>
+
     </DndContext>
   )
 
   function handleDragEnd(event: any) {
-    const {over} = event
-    setParent(over ? over.id : null)
+    const {active, over} = event;
+    console.log(active)
+    
+    if (active.id !== over.id) {
+      const oldIndex = items.findIndex((item) => item.id === active.id)
+          const newIndex = items.findIndex((item) => item.id === over.id)
+          const newItems = arrayMove(items, oldIndex, newIndex)
+          setItems(newItems)
+    }
   }
 
 }
