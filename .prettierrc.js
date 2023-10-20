@@ -15,14 +15,4 @@ module.exports = {
   trailingComma: 'es5',
   useTabs: false,
   vueIndentScriptAndStyle: false,
-  overrides: [
-    {
-      files: '*.json5',
-      options: { parser: 'json' },
-    },
-    {
-      files: '*.html.ejs',
-      options: { parser: 'html' },
-    },
-  ],
 }
